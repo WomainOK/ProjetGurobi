@@ -3,6 +3,8 @@ import gurobipy as gp
 from gurobipy import GRB
 from dataclasses import dataclass
 import itertools
+import argparse
+import os
 
 @dataclass
 class Photo:
@@ -12,16 +14,20 @@ class Photo:
 
 def read_input(filepath: str) -> List[Photo]:
     """Lit les données d'entrée depuis un fichier et crée une liste d'objets Photo."""
-    photos = []
-    with open(filepath, 'r') as f:
-        n = int(f.readline())  # Nombre total de photos
-        for i in range(n):
-            line = f.readline().strip().split()
-            is_horizontal = line[0] == 'H'  # Vérifie si la photo est horizontale
-            n_tags = int(line[1])  # Nombre de tags
-            tags = set(line[2:2 + n_tags])  # Ensemble des tags
-            photos.append(Photo(i, is_horizontal, tags))
-    return photos
+    if not os.path.isfile(filepath):
+        print(f"Erreur : Le fichier '{filepath}' n'existe pas.")
+        return
+    else:
+        photos = []
+        with open(filepath, 'r') as f:
+            n = int(f.readline())  # Nombre total de photos
+            for i in range(n):
+                line = f.readline().strip().split()
+                is_horizontal = line[0] == 'H'  # Vérifie si la photo est horizontale
+                n_tags = int(line[1])  # Nombre de tags
+                tags = set(line[2:2 + n_tags])  # Ensemble des tags
+                photos.append(Photo(i, is_horizontal, tags))
+        return photos
 
 def get_transition_score(tags1: Set[str], tags2: Set[str]) -> int:
     """Calcule le score de transition entre deux ensembles de tags."""
@@ -135,7 +141,12 @@ class PhotoSlideshowOptimizer:
 
 def main():
     """Fonction principale pour exécuter l'optimisation."""
-    input_file = "PetPics-20.txt"
+    parser = argparse.ArgumentParser(description="Script pour afficher le contenu d'un fichier texte.")
+    parser.add_argument("chemin_fichier", type=str, help="Chemin du fichier texte à lire")
+
+    args = parser.parse_args()
+
+    input_file = args.chemin_fichier
     photos = read_input(input_file)
 
     optimizer = PhotoSlideshowOptimizer(photos)
