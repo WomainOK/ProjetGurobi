@@ -139,7 +139,7 @@ def main():
     photos = read_input(input_file)
 
     optimizer = PhotoSlideshowOptimizer(photos)
-    solution, score = optimizer.optimize(time_limit=10)
+    solution, score = optimizer.optimize(time_limit=120)
 
     if solution:
         with open("slideshow.sol", "w") as f:
